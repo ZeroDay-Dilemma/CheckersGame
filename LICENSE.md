@@ -1,0 +1,1 @@
+This software is licensed under the "Do whatever the hell you want" license. Obviously, we hope you'll use it for good and not evil, but the choice is completely up to you.
