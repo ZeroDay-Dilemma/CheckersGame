@@ -30,6 +30,8 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
     JMenu menu;
     JMenuItem newGame, exit;
 
+
+    JLabel turn, gameStatus;
     private final int SIZE_PIXEL = 80;
     private final int SCREEN_WIDTH = 840, SCREEN_HEIGHT = 640;
     private final int BOARD_WIDTH = 640, BOARD_HEIGHT = 640;
@@ -52,6 +54,12 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
             public Dimension getPreferredSize() {
                 return new Dimension(BOARD_WIDTH, BOARD_HEIGHT);
             }
+            // Uncomment the following lines if you also want to prevent the
+            // 'wrapping' of the panel.
+            /*
+             * @Override public Dimension getMinimumSize() { return new
+             * Dimension(400, 400); }
+             */
         };
         //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -94,7 +102,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
         
         
         bottomPanel = new JPanel();
-        bottomPanel.setLayout(new GridLayout(2,1,0,0));
+        bottomPanel.setLayout(new GridLayout(10,1,0,0));
         bottomPanel.setPreferredSize(new Dimension(BOTTOM_PANEL_WIDTH,BOTTOM_PANEL_HEIGHT));
         bottomPanel.setMinimumSize(new Dimension(BOTTOM_PANEL_WIDTH,BOTTOM_PANEL_HEIGHT));
         bottomPanel.setMaximumSize(new Dimension(BOTTOM_PANEL_WIDTH,BOTTOM_PANEL_HEIGHT));
@@ -149,8 +157,30 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
 
         JPanel contentPanel = new JPanel(new BorderLayout());
 
-        // bottomPanel.setBackground(Color.RED);
 
+        gameStatus = new JLabel(game.getGameStatus());
+        gameStatus.setFont(new Font("Arial", Font.PLAIN, 20));
+        gameStatus.setForeground(Color.BLACK);
+        bottomPanel.add(gameStatus);
+        turn = new JLabel("Turn: " + game.getTurn());
+        turn.setFont(new Font("Arial", Font.PLAIN, 20));
+        turn.setForeground(Color.BLACK);
+        bottomPanel.add(turn);
+
+
+        //DEBUG
+        JLabel debugTools = new JLabel("Debug Tools:");
+        JButton forceKing = new JButton("forceKing: OFF");
+        forceKing.setName("forceKing");
+        forceKing.addMouseListener(this);
+        bottomPanel.add(forceKing);
+        bottomPanel.add(debugTools);
+
+
+
+        
+        // bottomPanel.setBackground(Color.RED);
+    
         contentPanel.add(menuBar, BorderLayout.NORTH);
         contentPanel.add(bottomPanel, BorderLayout.EAST);
         contentPanel.add(centerPanel);
@@ -181,9 +211,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
     //input: position of tile
     //output: JLayeredPane with the tile
     
-
-    
-
     private JLayeredPane drawTile(int x,int y){
         
         JLayeredPane tile = new JLayeredPane();
@@ -235,8 +262,6 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
         return tile;
     }
 
-
-    //TODO it keeps shifting a few pixels every placement?? it is never adjusted like that, it should be static
     private Piece genPiece(int x, int y){
         
         if(game.gameBoard[x][y]!=0){
@@ -258,18 +283,17 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
             }
             Piece piece = new Piece(color, isKing,x,y);
             piece.setName("Piece_"+color.toString()+" "+ x +"-"+ y);
-            piece.setBorder(new LineBorder(Color.BLACK, 1));
+            
             piece.setBounds(8,8, SIZE_PIXEL-16,SIZE_PIXEL-16);
             piece.addMouseListener(this);
 
             //JPanel 64x64 black square
-            // THIS WORKS PERFECTLY SO LIKE WHATS UP??
-
             // JPanel square = new JPanel();
+            // square.setBackground(Color.BLACK);
             // square.setBounds(8,8,SIZE_PIXEL-16,SIZE_PIXEL-16);
-            //square.add(piece);
-            //square.addMouseListener(this);
-            //return square;
+            // square.add(piece);
+            // square.addMouseListener(this);
+            // return square;
 
             return piece;
             
@@ -279,8 +303,15 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
         
     }
 
-    public void updateTile(int x, int y){
+    private Piece pieceBorder(int x, int y){
+        Piece piece = genPiece(x,y);
+        piece.setBorder(new LineBorder(Color.RED, 2));
+        return piece;
 
+    }
+
+
+    public void updateTile(int x, int y){
         JLayeredPane tile = drawTile(x,y);
 
         //never need to remove base tile
@@ -295,6 +326,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
         boardTiles[x][y].revalidate();
         boardTiles[x][y].repaint();
     }
+    
 
 
     public void redrawBoard(){
@@ -307,126 +339,163 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
         boardPanelBase.revalidate();
         boardPanelBase.repaint();
     }
-    // private JLayeredPane[] drawBoardTiles(){
-    //     JLayeredPane[] tiles = new JLayeredPane[64];
-    //     for (int i = 0; i < 64; i++){
-    //         tiles[i] = new JLayeredPane();
-            
-    //         if((i/8)%2 == 0){
-    //             if(i%2 == 0){
-    //                 tiles[i].add(new Tile(TileColor.GREEN), new Integer(2), -1);
-    //                 //tiles[i].add(new JPanel((LayoutManager) new Tile(TileColor.GREEN)));
-    //             }
-    //             else{
-    //                 tiles[i].add(new Tile(TileColor.WHITE), new Integer(2), -1);
-    //             }
-    //         }
-    //         else{
-    //             if(i%2 == 0){
-    //                 tiles[i].add(new Tile(TileColor.WHITE), new Integer(2), -1);
-    //             }
-    //             else{
-    //                 tiles[i].add(new Tile(TileColor.GREEN), new Integer(2), -1);
-    //             }
-    //         }
-    //         tiles[i].setPreferredSize(new Dimension(SIZE_PIXEL,SIZE_PIXEL));
-    //         tiles[i].setMinimumSize(new Dimension(SIZE_PIXEL,SIZE_PIXEL));
-    //         tiles[i].setMaximumSize(new Dimension(SIZE_PIXEL,SIZE_PIXEL));
-    //         tiles[i].setBorder(new LineBorder(Color.BLACK, 1));
-    //         tiles[i].addMouseListener(this);
-            
-    //     }   
-        
-    //     return tiles;
-    // }
 
-    //SHIT CODE
-    //just store the info in the tile or the piece
-    //left for reference
-    //TODO clean up all name stuff, not useful anymore
 
-    private String[] nameToVals(String name){ 
-        //name format: [PieceType]_[Color] [x]-[y]
-        //ex "Piece_RED 0-0"
 
-        String[] vals = new String[4];
-        
-        String[] split = name.split(" ");
-        //split[0] = "Piece_RED"
-        //split[1] = "0-0"
-
-        //firstHalf[0] = "Piece"
-        //firstHalf[1] = "RED"
-        String[] firstHalf = split[0].split("_");
-
-        String[] posHalf = split[1].split("-");
-        //int x = Integer.parseInt(pos[0]);
-        //int y = Integer.parseInt(pos[1]);
-
-        
-        return new String[]{firstHalf[0], firstHalf[1], posHalf[0], posHalf[1]};
-    }
     // implements....
     // ActionListener, MouseListener, MouseMotionListener
-    Piece placeHolder=null;
+
+    //Piece game.pieceHeld=null;
+
+    //debug booleans
+    boolean forceKing=false;
     @Override
     public void mousePressed(MouseEvent arg0) {
 
-
-        
-        if(arg0.getComponent().getName().contains("Tile")){
-            String name = arg0.getComponent().getName();
-
-
-            System.out.println(arg0.getComponent().getName());
-            //print out type
-
-            System.out.println(arg0.getComponent().getClass());
-            if(placeHolder!=null){
-
-                Tile currTile = (Tile) arg0.getComponent();
-                game.gameBoard[currTile.getTileX()][currTile.getTileY()]=placeHolder.valueForGrid();
-
-                
-                int x = placeHolder.getX();
-                int y = placeHolder.getY();
-                
-                game.gameBoard[x][y]=0;
-                updateTile(x,y);
-
-                updateTile(currTile.getTileX(),currTile.getTileY());
-
-
-                placeHolder=null;
+        if(game.gameOver){
+            return;
+        }
+        //if button
+        if(arg0.getComponent() instanceof JButton){
+            System.out.println("button!");
+            JButton button = (JButton) arg0.getComponent();
+            if(button.getName() == "forceKing"){
+                if(forceKing==false){
+                    button.setText("Force King: ON");
+                    forceKing=true;
+                }
+                else{
+                    button.setText("Force King: OFF");
+                    forceKing=false;
+                }
+                button.repaint();
+                button.revalidate();
             }
         }
 
-        else if(placeHolder!=null){
-            //clear border
-
-        }
-        else if(arg0.getComponent() instanceof Piece){
-            //TODO DRAW BORDER AROUND ACTIVE PIECE
+        //Clicked a Tile
+        if(arg0.getComponent() instanceof Tile){
             
-
-
-            //setBorder(new LineBorder(Color.BLACK, 1));
-
-            placeHolder = (Piece)arg0.getComponent();
-
-            //print getX and getY
-            System.out.println("Piece: "+placeHolder.getX()+"-"+placeHolder.getY());
-
-            int x = placeHolder.getX();
-            int y = placeHolder.getY();
-            
-            //game.gameBoard[x][y]=0;
-            
-            updateTile(placeHolder.getX(),placeHolder.getY());
-
-            //redrawBoard();
+            //String name = arg0.getComponent().getName();
             System.out.println(arg0.getComponent().getName());
+            Tile currTile = (Tile) arg0.getComponent();
+
+
+            System.out.println("Tile Clicked: "+currTile.getTileX()+" "+currTile.getTileY());
+
+
+            //if we have currently selected a tile
+            if(game.pieceHeld!=null){
+
+                
+                //Piece img doesn't completely cover tile, so this prevents the edge case where that would pop up
+                if(game.gameBoard[currTile.getTileX()][currTile.getTileY()]!=0){
+                    System.out.println("Clicked edge of a tile with a pice, treat like invalid input");
+                    return;
+                }
+
+                //first we gotta check if its a legal move
+                
+                if(game.tryMove(currTile)){
+                    
+                    updateTile(game.pieceHeld.pGetX(),game.pieceHeld.pGetY());
+                    updateTile(currTile.getTileX(), currTile.getTileY());
+                    int[] tilesAffected = game.tilesAffected(currTile.getTileX(), currTile.getTileY());
+                    if(tilesAffected!=null){
+                        updateTile(tilesAffected[0],tilesAffected[1]);
+                        System.out.println("Tile Affected: "+tilesAffected[0]+" "+tilesAffected[1]);
+                    }
+                    //redrawBoard();
+                    turn.setText("Turn: "+game.turn.toString());
+                    turn.repaint();
+                    turn.revalidate();
+                    if(game.gameOver){
+                        turn.setText("Winner: "+game.winner.toString());
+                        gameStatus.setText(game.getGameStatus());
+                        gameStatus.repaint();
+                        gameStatus.revalidate();
+                    }
+                    game.resetPH();
+                }
+                else{
+                    System.out.println("Invalid Move");
+                }
+            }
+            else{ //dont do anything
+                System.out.println("No piece selected");
+            }
         }
+
+        //clicked a piece
+        else if(arg0.getComponent()  instanceof Piece){
+            
+            if(forceKing){
+                Piece piece = (Piece) arg0.getComponent();
+                piece.setKing(true);
+                game.gameBoard[piece.pGetX()][piece.pGetY()]=(byte) ((byte)(piece.getColor()).toByte()*10);
+                piece.repaint();
+                piece.revalidate();
+                updateTile(piece.pGetX(), piece.pGetY());
+                
+
+
+            }
+            //TODO move this to checkersEngine 
+            Piece clickedPiece = (Piece) arg0.getComponent();
+
+            System.out.println("Piece Clicked: "+clickedPiece.pGetX()+" "+clickedPiece.pGetY());
+            //make sure only the right player can touch their pieces
+            if(game.trySelect(clickedPiece)){
+                //if we have a piece selected, and we select another piece, clear selected;
+                if(game.pieceHeld!=null){
+                    game.resetPH();
+                }
+                //game.tryMove(clickedPiece, );
+                game.pieceHeld = (Piece) arg0.getComponent();
+                game.pieceHeld.setBorder(new LineBorder(Color.RED, 2));
+                // int[][] moves = game.legalTiles(game.pieceHeld.pGetX(), game.pieceHeld.pGetY(), game.pieceHeld.getColor(),game.pieceHeld.getKing());
+                // for(int i = 0; i < moves.length; i++){
+                //     for (int j = 0; j < moves[i].length; j++) {
+                //         System.out.print("Legal Move: " + moves[i][j]+" ");
+                //     }
+                //     System.out.println();
+                // }
+                System.out.println("Piece: "+game.pieceHeld.pGetX()+"-"+game.pieceHeld.pGetY());
+            }
+            //we clicked on a piece, but it was the wrong player
+            else{
+                System.out.println("Not your piece!");
+                if(game.pieceHeld!=null){
+                    game.resetPH();
+                }
+            }
+
+            
+
+
+            //if we have currently selected a tile
+
+            //updateTile(placeHolder.pGetX(),placeHolder.pGetY());
+        }
+
+        else{
+
+        }
+
+        // else if(arg0.getComponent() instanceof Piece){
+        //     System.out.println("HI");
+        //     //TODO DRAW BORDER AROUND ACTIVE PIECE
+        //     //setBorder(new LineBorder(Color.BLACK, 1));
+        //     placeHolder = (Piece)arg0.getComponent();
+        //     //print getX and getY
+        //     int x = placeHolder.pGetX();
+        //     int y = placeHolder.pGetY();
+        //     //game.gameBoard[x][y]=0;
+        //     updateTile(placeHolder.pGetX(),placeHolder.pGetY());
+        //     System.out.println("Piece: "+placeHolder.pGetX()+"-"+placeHolder.pGetY());
+        //     //redrawBoard();
+        //     System.out.println(arg0.getComponent().getName());
+        // }
 
     }
 
@@ -466,4 +535,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener, MouseM
     }
 
 
+
+
+    
 }

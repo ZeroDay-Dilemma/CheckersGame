@@ -9,10 +9,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-//asking for one piece jokes
-//its just begging for some
-//but i have some self restraint
-//and dignaty
+
 public class Piece extends JPanel{
 
     public boolean isKing=false;
@@ -20,7 +17,6 @@ public class Piece extends JPanel{
     private BufferedImage image;
     private int pieceX; //used to store position, solely for tracking if movement error
     private int pieceY; //used to store position, solely for tracking if movement error
-
     private int sizePixel = 80;
 
 
@@ -112,18 +108,19 @@ public class Piece extends JPanel{
     public PIECE_COLOR getColor() {
         return color;
     }
-    public boolean getIsKing(){
+    public boolean getKing(){
         return isKing;
     }
-    public int getX(){
+    public int pGetX(){
         return pieceX;
     }
-    public int getY(){
+    
+    public int pGetY(){
         return pieceY;
     }
 
     //setters
-    public void setIsKing(boolean isKing){
+    public void setKing(boolean isKing){
         this.isKing = isKing;
     }
     public void pSetX(int x){

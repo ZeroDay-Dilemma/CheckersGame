@@ -9,6 +9,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        //it all starts here
         Main try1 = new Main();
     }
 }
